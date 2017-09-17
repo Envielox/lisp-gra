@@ -1,0 +1,4 @@
+lisp-implementation-type: Clozure Common Lisp
+lisp-implementation-version: Version 1.9-dev-r15508  (WindowsX8664)
+machine-type: x64
+machine-version: Intel64 Family 6 Model 45 Stepping 7, GenuineIntel
