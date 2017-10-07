@@ -172,6 +172,25 @@
         )
     (prep-mesh (resize-vertexes vertexes radius) vertexes indices color)))
 
+(defun prep-floor (color size-x size-y)
+  (declare (optimize (debug 3)))
+  (let* ((vertices (loop
+                     for y from 0 to size-y
+                     append (loop for x from 0 to size-x
+                                  collect `(,(float x) ,(float y) 0.0))))
+         (indices (loop
+                    for y from 0 below size-y
+                    append (loop for x from 0 below size-x
+                                 append (let ((cur-idx (+ x (* y (+ 1 size-x))))
+                                              (row_size (+ 1 size-x)))
+                                          `(,cur-idx ,(+ 1 cur-idx) ,(+ cur-idx row_size)
+                                                     ,(+ 1 cur-idx) ,(+ 1 row_size cur-idx) ,(+ cur-idx row_size))))))
+         (normals (loop
+                    for i in vertices
+                    collect '(0.0 0.0 1.0))))
+    ;`(,vertices ,indices)))
+    (prep-mesh vertices normals indices color)))
+
 ;##################################################
 
 (defstruct object mesh pos)
@@ -181,9 +200,11 @@
 
 (defparameter *box* (prep-cube '(255 0 0) 1))
 (defparameter *sphere* (prep-ico-sphere '(0 0 255) 1.2))
+(defparameter *floor* (prep-floor '(0 255 0) 5 5))
 
 (defparameter *obj-1* (make-object :mesh *sphere* :pos '(0 0 -2)))
 (defparameter *sun* (make-object :mesh (prep-cube '(255 255 0) 0.1) :pos (butlast *light-pos*)))
+(defparameter *ground* (make-object :mesh *floor* :pos '(0 0 -1)))
 
 (defun move-object (object dir)
   (setf
@@ -219,6 +240,7 @@
     (gl:translate 0 0 -5)
     (draw-object *obj-1*)
     (draw-object *sun*)
+    (draw-object *ground*)
     (gl:flush))
 
 (defun setup-view ()
