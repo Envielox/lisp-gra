@@ -1,0 +1,47 @@
+(defparameter *objects-to-draw* nil)
+
+(defun render ()
+  (declare (optimize speed))
+
+    (gl:light :light0 :position *light-pos*)
+    (gl:clear :color-buffer :depth-buffer)
+    (gl:enable-client-state :vertex-array)
+    (gl:enable-client-state :color-array)
+    (gl:enable-client-state :normal-array)
+    (gl:matrix-mode :modelview)
+    (update-camera-pos *camera*)
+    (loop for obj in *objects-to-draw*
+      do (draw-object obj))
+    (gl:flush))
+
+(defun setup-view ()
+  (gl:viewport 0 0 800 800)
+  (gl:matrix-mode :projection)
+  ;(gl:ortho -5 5 -5 5 -2 2)
+  (gl:frustum -5 5 -5 5 5 20)
+  (gl:matrix-mode :modelview)
+  (gl:load-identity))
+
+(defun setup-lightning () 
+  ;; Lightning stuff
+  (gl:light :light0 :position *light-pos*)
+  (gl:light :light0 :linear-attenuation 1.0)
+  ;(gl:light :light0 :quadratic-attenuation 1.0)
+  ;(gl:light :light0 :diffuse '(1.0 0.5 0.0 0.0))
+  (gl:enable :lighting)
+  (gl:enable :light0)
+  )
+
+(defun setup-gl ()
+  (setup-view)
+  (setup-lightning)
+  (gl:shade-model :smooth)
+  (gl:material :front-and-back :specular '(1.0 1.0 1.0 1.0))
+  (gl:material :front-and-back :shininess 50.0)
+  (gl:enable :depth-test)
+  ;(gl:enable :color-material)
+  (gl:color-material :front-and-back :diffuse)
+  ;(gl:enable :cull-face)
+  ;(gl:cull-face :back)
+  ;; Clear to black
+  (gl:clear-color 0.0 0.0 0.0 1.0))
